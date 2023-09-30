@@ -1,14 +1,6 @@
-use actix_web::{get, post, web::Json, App, HttpResponse, HttpServer, Responder};
-use chrono::prelude::*;
-use serde::{Deserialize, Serialize};
+mod domain;
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Task {
-    id: i32,
-    title: String,
-    description: String,
-    due_date: NaiveDate,
-}
+use actix_web::{get, post, web::Json, App, HttpResponse, HttpServer, Responder};
 
 #[get("/healthcheck")]
 async fn healthcheck() -> impl Responder {
@@ -16,8 +8,8 @@ async fn healthcheck() -> impl Responder {
 }
 
 #[post("/tasks")]
-async fn create_task(task: Json<Task>) -> impl Responder {
-    println!("task: {:?}", task);
+async fn create_task(task: Json<domain::entities::Task>) -> impl Responder {
+    println!("task: {:?}", task.into_inner());
     HttpResponse::Ok().finish()
 }
 
