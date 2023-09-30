@@ -5,5 +5,5 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4.4.0"
-chrono = "0.4.31"
-serde = { "1.0.188", features = ["derive"] }
+chrono = { version = "0.4.31", features = ["serde"] }
+serde = { version = "1.0.188", features = ["derive"] }
