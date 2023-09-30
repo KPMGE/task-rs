@@ -6,5 +6,5 @@ pub struct Task {
     pub id: i32,
     pub title: String,
     pub description: String,
-    pub due_date: NaiveDate,
+    pub due_date: NaiveDateTime,
 }
