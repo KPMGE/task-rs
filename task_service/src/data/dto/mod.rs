@@ -1,9 +1,8 @@
-use chrono::prelude::*;
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Task {
-    pub id: i32,
+pub struct CreateTaskDto {
     pub title: String,
     pub description: String,
     pub due_date: Option<NaiveDateTime>,
