@@ -18,12 +18,13 @@ use serde::{Deserialize, Serialize};
 struct CreateTaskDto {
     pub title: String,
     pub description: String,
-    // pub due_date: NaiveDateTime,
+    pub due_date: NaiveDateTime,
 }
 
 #[post("/tasks")]
 pub async fn create_task(pool: Data<PgPool>, task_json: Json<CreateTaskDto>) -> impl Responder {
     let task = task_json.into_inner();
+
     let mut transaction = pool
         .into_inner()
         .begin()
@@ -32,11 +33,12 @@ pub async fn create_task(pool: Data<PgPool>, task_json: Json<CreateTaskDto>) -> 
 
     sqlx::query!(
         r#"
-            INSERT INTO "tasks" (title, description) 
-            VALUES($1, $2)
+            INSERT INTO "tasks" (title, description, due_date) 
+            VALUES($1, $2, $3)
         "#,
         task.title,
         task.description,
+        task.due_date,
     )
     .execute(&mut transaction)
     .await
