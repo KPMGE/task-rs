@@ -6,6 +6,7 @@ use std::{env, time::Duration};
 
 mod domain;
 mod presentation;
+mod data;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

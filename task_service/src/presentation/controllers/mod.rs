@@ -5,7 +5,6 @@ use actix_web::{
     web::{Data, Json},
     HttpResponse, Responder,
 };
-use chrono::NaiveDateTime;
 use sqlx::PgPool;
 
 #[get("/healthcheck")]
@@ -13,16 +12,8 @@ pub async fn healthcheck() -> impl Responder {
     HttpResponse::Ok().finish()
 }
 
-use serde::{Deserialize, Serialize};
-#[derive(Debug, Serialize, Deserialize)]
-struct CreateTaskDto {
-    pub title: String,
-    pub description: String,
-    pub due_date: NaiveDateTime,
-}
-
 #[post("/tasks")]
-pub async fn create_task(pool: Data<PgPool>, task_json: Json<CreateTaskDto>) -> impl Responder {
+pub async fn create_task(pool: Data<PgPool>, task_json: Json<crate::data::dto::CreateTaskDto>) -> impl Responder {
     let task = task_json.into_inner();
 
     let mut transaction = pool
