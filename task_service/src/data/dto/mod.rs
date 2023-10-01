@@ -5,5 +5,5 @@ use serde::{Deserialize, Serialize};
 pub struct CreateTaskDto {
     pub title: String,
     pub description: String,
-    pub due_date: NaiveDateTime,
+    pub due_date: Option<NaiveDateTime>,
 }
