@@ -9,12 +9,7 @@ pub async fn list_task_service(
         .list()
         .await?
         .iter()
-        .map(|task_db| Task {
-            id: task_db.id,
-            title: task_db.title.clone(),
-            description: task_db.description.clone(),
-            due_date: task_db.due_date,
-        })
+        .map(|task_db| task_db.into())
         .collect();
 
     Ok(tasks)
