@@ -2,7 +2,10 @@ use async_trait::async_trait;
 use sqlx::PgPool;
 
 use crate::{
-    data::{dto::CreateTaskDto, repositories::CreateTaskRepository},
+    data::{
+        dto::CreateTaskDto,
+        repositories::{CreateTaskRepository, ListTaskRepository},
+    },
     infra::models::task::TaskDb,
 };
 
@@ -46,5 +49,34 @@ impl CreateTaskRepository for TaskRepository {
             .expect("error when commiting transaction");
 
         Ok(created_task_db)
+    }
+}
+
+#[async_trait]
+impl ListTaskRepository for TaskRepository {
+    async fn list(&self) -> Result<Vec<TaskDb>, sqlx::Error> {
+        let mut transaction = self
+            .pool
+            .begin()
+            .await
+            .expect("could not create transaction");
+
+        let tasks = sqlx::query_as!(
+            TaskDb,
+            r#"
+                SELECT id, title, description, due_date, created_at, updated_at 
+                FROM "tasks"
+            "#
+        )
+        .fetch_all(&mut transaction)
+        .await
+        .expect("error when fetching tasks");
+
+        transaction
+            .commit()
+            .await
+            .expect("error when commiting transaction");
+
+        Ok(tasks)
     }
 }
