@@ -11,13 +11,24 @@ pub struct TaskDb {
     pub updated_at: NaiveDateTime,
 }
 
-impl Into<Task> for TaskDb {
-    fn into(self) -> Task {
+impl From<TaskDb> for Task {
+    fn from(value: TaskDb) -> Self {
         Task {
-            id: self.id,
-            description: self.description,
-            title: self.title,
-            due_date: self.due_date,
+            id: value.id,
+            description: value.description,
+            title: value.title,
+            due_date: value.due_date,
+        }
+    }
+}
+
+impl From<&TaskDb> for Task {
+    fn from(value: &TaskDb) -> Self {
+        Task {
+            id: value.id,
+            description: value.description.clone(),
+            title: value.title.clone(),
+            due_date: value.due_date,
         }
     }
 }
