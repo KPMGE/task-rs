@@ -4,7 +4,7 @@ use sqlx::PgPool;
 use crate::{
     data::{
         dto::CreateTaskDto,
-        repositories::{CreateTaskRepository, ListTaskRepository},
+        repositories::{CreateTaskRepository, DeleteTaskRepository, ListTaskRepository},
     },
     infra::models::task::TaskDb,
 };
@@ -78,5 +78,34 @@ impl ListTaskRepository for TaskRepository {
             .expect("error when commiting transaction");
 
         Ok(tasks)
+    }
+}
+
+#[async_trait]
+impl DeleteTaskRepository for TaskRepository {
+    async fn delete(&self, task_id: i32) -> Result<(), sqlx::Error> {
+        let mut transaction = self
+            .pool
+            .begin()
+            .await
+            .expect("could not start transaction");
+
+        sqlx::query!(
+            r#"
+                DELETE FROM "tasks" 
+                WHERE id = $1
+            "#,
+            task_id
+        )
+        .execute(&mut transaction)
+        .await
+        .expect("error when deleting task");
+
+        transaction
+            .commit()
+            .await
+            .expect("error when commiting transaction");
+
+        Ok(())
     }
 }
