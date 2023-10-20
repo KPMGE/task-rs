@@ -1,9 +1,22 @@
 use chrono::{Duration, Local};
 
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, post, web::Json, App, HttpResponse, HttpServer, Responder};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize)]
+struct User {
+    id: i32,
+    name: String,
+    email: String,
+}
+
+#[post("/signup")]
+async fn signup(user_data: Json<User>) -> impl Responder {
+    println!("got user: {:?}", user_data.into_inner());
+    HttpResponse::Ok().finish()
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Claims {
@@ -70,8 +83,13 @@ async fn main() -> std::io::Result<()> {
 
     println!("server listening on: http://127.0.0.1:{}", port);
 
-    HttpServer::new(move || App::new().service(login).service(test_token))
-        .bind(("127.0.0.1", port))?
-        .run()
-        .await
+    HttpServer::new(move || {
+        App::new()
+            .service(login)
+            .service(test_token)
+            .service(signup)
+    })
+    .bind(("127.0.0.1", port))?
+    .run()
+    .await
 }
