@@ -1,11 +1,14 @@
 use actix_web::{web::Data, App, HttpServer};
 use dotenv::dotenv;
 use infra::repositories::task::TaskRepository;
-use presentation::controllers::{
-    create_task_controller, healthcheck_controller, list_task_controller,
-};
 use sqlx::postgres::PgPoolOptions;
 use std::{env, time::Duration};
+use presentation::controllers::{
+    create_task_controller,
+    healthcheck_controller, 
+    list_task_controller,
+    delete_task_controller
+};
 
 mod data;
 mod domain;
@@ -36,6 +39,7 @@ async fn main() -> std::io::Result<()> {
             .service(healthcheck_controller)
             .service(create_task_controller)
             .service(list_task_controller)
+            .service(delete_task_controller)
             .app_data(task_repository.clone())
     })
     .bind(("127.0.0.1", port))?
