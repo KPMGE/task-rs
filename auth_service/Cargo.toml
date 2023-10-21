@@ -11,3 +11,4 @@ actix-web-httpauth = "0.8.1"
 chrono = "0.4.31"
 jsonwebtoken = "9.0.0"
 serde = { version = "1.0.188", features = ["derive"] }
+sqlx = "0.7.2"
