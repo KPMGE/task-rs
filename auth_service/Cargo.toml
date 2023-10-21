@@ -8,7 +8,21 @@ edition = "2021"
 [dependencies]
 actix-web = "4.4.0"
 actix-web-httpauth = "0.8.1"
+async-trait = "0.1.74"
 chrono = "0.4.31"
+dotenv = "0.15.0"
 jsonwebtoken = "9.0.0"
 serde = { version = "1.0.188", features = ["derive"] }
-sqlx = "0.7.2"
+
+[dependencies.sqlx]
+version = "0.5.7"
+default-features = false
+features = [
+  "runtime-actix-rustls",
+  "macros",
+  "postgres", 
+  "uuid",
+  "chrono",
+  "migrate",
+  "offline"
+]
