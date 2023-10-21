@@ -5,9 +5,12 @@ use actix_web::{get, post, web::Json, App, HttpResponse, HttpServer, Responder};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 
-use crate::domain::{Claims, User};
+use crate::domain::entities::{Claims, User};
 
 mod domain;
+mod data;
+mod infra;
+mod presentation;
 
 #[post("/signup")]
 async fn signup(user_data: Json<User>) -> impl Responder {
