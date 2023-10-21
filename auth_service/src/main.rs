@@ -1,22 +1,21 @@
 use chrono::{Duration, Local};
+use dotenv::dotenv;
 use serde::{Deserialize, Serialize};
+use sqlx::postgres::PgPoolOptions;
+use std::env;
 
-use actix_web::{get, post, web::Json, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, web::Data, App, HttpResponse, HttpServer, Responder};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 
-use crate::domain::entities::{Claims, User};
+use crate::domain::entities::Claims;
+use crate::infra::repositories::user::UserRepository;
+use crate::presentation::controllers::signup_controller;
 
-mod domain;
 mod data;
+mod domain;
 mod infra;
 mod presentation;
-
-#[post("/signup")]
-async fn signup(user_data: Json<User>) -> impl Responder {
-    println!("got user: {:?}", user_data.into_inner());
-    HttpResponse::Ok().finish()
-}
 
 #[get("/login")]
 async fn login() -> impl Responder {
@@ -71,7 +70,21 @@ async fn test_token(auth: BearerAuth) -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let port = 3334;
+    dotenv().ok();
+
+    let port = env::var("API_PORT")
+        .expect("API_PORT environment variable must be set!")
+        .parse::<u16>()
+        .expect("API_PORT must be a number");
+    let database_url =
+        env::var("DATABASE_URL").expect("DATABASE_URL environment variable must be set!");
+
+    let pool = PgPoolOptions::new()
+        .connect_timeout(std::time::Duration::from_secs(30))
+        .connect_lazy(database_url.as_str())
+        .expect("could not connect to the databse!");
+
+    let user_repo = Data::new(UserRepository::new(pool));
 
     println!("server listening on: http://127.0.0.1:{}", port);
 
@@ -79,7 +92,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .service(login)
             .service(test_token)
-            .service(signup)
+            .service(signup_controller)
+            .app_data(user_repo.clone())
     })
     .bind(("127.0.0.1", port))?
     .run()
