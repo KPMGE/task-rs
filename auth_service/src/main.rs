@@ -5,7 +5,7 @@ use actix_web::{get, post, web::Json, App, HttpResponse, HttpServer, Responder};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 
-use crate::domain::User;
+use crate::domain::{Claims, User};
 
 mod domain;
 
@@ -13,14 +13,6 @@ mod domain;
 async fn signup(user_data: Json<User>) -> impl Responder {
     println!("got user: {:?}", user_data.into_inner());
     HttpResponse::Ok().finish()
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Claims {
-    iat: i64,
-    exp: i64,
-    sub: String,
-    name: String,
 }
 
 #[get("/login")]
