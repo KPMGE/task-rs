@@ -1,16 +1,13 @@
 use chrono::{Duration, Local};
+use serde::{Deserialize, Serialize};
 
 use actix_web::{get, post, web::Json, App, HttpResponse, HttpServer, Responder};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
-struct User {
-    id: i32,
-    name: String,
-    email: String,
-}
+use crate::domain::User;
+
+mod domain;
 
 #[post("/signup")]
 async fn signup(user_data: Json<User>) -> impl Responder {
