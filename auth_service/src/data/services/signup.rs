@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use validator::Validate;
 
 use crate::{
     data::{dto::CreateUserDto, repositories::CreateUserRepository},
@@ -9,6 +10,8 @@ pub async fn signup_service(
     repo: Arc<impl CreateUserRepository>,
     user: CreateUserDto,
 ) -> Result<Token, sqlx::Error> {
+    user.validate().expect("error when validating user");
+
     let created_user = repo.create_user(user).await?;
     let now = chrono::Local::now();
     let iat = now.timestamp();
