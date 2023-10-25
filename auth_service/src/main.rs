@@ -4,7 +4,7 @@ use sqlx::postgres::PgPoolOptions;
 use std::env;
 
 use crate::infra::repositories::user::UserRepository;
-use crate::presentation::controllers::{signup_controller, login_controller};
+use crate::presentation::controllers::{login_controller, signup_controller};
 
 mod data;
 mod domain;

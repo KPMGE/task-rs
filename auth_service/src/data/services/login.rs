@@ -28,8 +28,8 @@ pub async fn login_service(
     };
 
     let header = jsonwebtoken::Header::default();
-    let secret_str = "super secret".as_bytes();
-    let secret_key = jsonwebtoken::EncodingKey::from_secret(secret_str);
+    let secret_str = std::env::var("JWT_SECRET").unwrap();
+    let secret_key = jsonwebtoken::EncodingKey::from_secret(secret_str.as_bytes());
 
     let token = jsonwebtoken::encode(&header, &claims, &secret_key)
         .expect("error while encoding user info");

@@ -1,3 +1,4 @@
+use std::env;
 use std::sync::Arc;
 use validator::Validate;
 
@@ -33,8 +34,8 @@ pub async fn signup_service(
     };
 
     let header = jsonwebtoken::Header::default();
-    let secret_str = "super secret".as_bytes();
-    let secret_key = jsonwebtoken::EncodingKey::from_secret(secret_str);
+    let secret_str = env::var("JWT_SECRET").unwrap().clone();
+    let secret_key = jsonwebtoken::EncodingKey::from_secret(secret_str.as_bytes());
 
     let token = jsonwebtoken::encode(&header, &claims, &secret_key)
         .map_err(|e| SignupError::TokenError(e))?;
