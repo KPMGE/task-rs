@@ -4,6 +4,7 @@ use actix_web::{
     HttpResponse, Responder,
 };
 
+use crate::domain::errors::SignupError;
 use crate::{
     data::{dto::CreateUserDto, services::signup_service},
     infra::repositories::user::UserRepository,
@@ -20,5 +21,8 @@ pub async fn signup_controller(
     signup_service(repo, user)
         .await
         .map(|token| HttpResponse::Ok().json(token))
-        .unwrap_or_else(|_| HttpResponse::InternalServerError().finish())
+        .unwrap_or_else(|e| match e {
+            SignupError::InvalidUserError(e) => HttpResponse::BadRequest().json(e),
+            _ => HttpResponse::InternalServerError().finish()
+        })
 }

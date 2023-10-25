@@ -3,16 +3,23 @@ use validator::Validate;
 
 use crate::{
     data::{dto::CreateUserDto, repositories::CreateUserRepository},
-    domain::entities::{Claims, Token},
+    domain::{
+        entities::{Claims, Token},
+        errors::SignupError,
+    },
 };
 
 pub async fn signup_service(
     repo: Arc<impl CreateUserRepository>,
     user: CreateUserDto,
-) -> Result<Token, sqlx::Error> {
-    user.validate().expect("error when validating user");
+) -> Result<Token, SignupError> {
+    user.validate()
+        .map_err(|e| SignupError::InvalidUserError(e))?;
 
-    let created_user = repo.create_user(user).await?;
+    let created_user = repo
+        .create_user(user)
+        .await
+        .map_err(|e| SignupError::DatabaseError(e))?;
     let now = chrono::Local::now();
     let iat = now.timestamp();
     let expiration_time = chrono::Duration::hours(1);
@@ -30,7 +37,7 @@ pub async fn signup_service(
     let secret_key = jsonwebtoken::EncodingKey::from_secret(secret_str);
 
     let token = jsonwebtoken::encode(&header, &claims, &secret_key)
-        .expect("error while encoding user info");
+        .map_err(|e| SignupError::TokenError(e))?;
 
     Ok(Token { token })
 }
