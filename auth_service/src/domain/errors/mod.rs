@@ -1,3 +1,13 @@
-mod signup;
+#[derive(Debug)]
+pub enum ApiErrorType {
+    DatabaseError,
+    ValidationError,
+    UnexpectedError,
+}
 
-pub use signup::*;
+#[derive(Debug)]
+pub struct ApiError {
+    pub cause: Option<String>,
+    pub message: Option<String>,
+    pub error_type: ApiErrorType,
+}
