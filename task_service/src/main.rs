@@ -1,14 +1,11 @@
 use actix_web::{web::Data, App, HttpServer};
 use dotenv::dotenv;
 use infra::repositories::task::TaskRepository;
+use presentation::controllers::{
+    create_task_controller, delete_task_controller, healthcheck_controller, list_task_controller,
+};
 use sqlx::postgres::PgPoolOptions;
 use std::{env, time::Duration};
-use presentation::controllers::{
-    create_task_controller,
-    healthcheck_controller, 
-    list_task_controller,
-    delete_task_controller
-};
 
 mod data;
 mod domain;
@@ -30,6 +27,14 @@ async fn main() -> std::io::Result<()> {
         .connect_timeout(Duration::from_secs(20))
         .connect_lazy(database_url.as_str())
         .expect("could not connect to the database!");
+
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .map_err(|e| {
+            panic!("MIGRATION ERROR: {}", e);
+        })
+        .unwrap();
 
     let task_repository = Data::new(TaskRepository::new(pool.clone()));
 

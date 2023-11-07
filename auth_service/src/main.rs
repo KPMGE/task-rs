@@ -27,6 +27,14 @@ async fn main() -> std::io::Result<()> {
         .connect_lazy(database_url.as_str())
         .expect("could not connect to the databse!");
 
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .map_err(|e| {
+            panic!("MIGRATION ERROR: {}", e);
+        })
+        .unwrap();
+
     let user_repo = Data::new(UserRepository::new(pool));
 
     println!("server listening on: http://127.0.0.1:{}", port);
